@@ -5,7 +5,8 @@ import {
   type NextAuthOptions,
 } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
-import DiscordProvider from "next-auth/providers/discord";
+import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 
 import { env } from "~/env";
 import { db } from "~/server/db";
@@ -48,19 +49,30 @@ export const authOptions: NextAuthOptions = {
   },
   adapter: PrismaAdapter(db) as Adapter,
   providers: [
-    DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
+      },
+      authorize: async (credentials) => {
+        // Add your own logic here to find the user from the credentials supplied
+        const user = await db.user.findUnique({
+          where: { email: credentials?.email },
+        });
+
+        if (user?.password) {
+          const isPasswordValid = await bcrypt.compare(credentials?.password ?? '', String(user?.password ?? ''));
+          if (isPasswordValid) {
+            // Remove the password field before returning the user object
+            const { password, ...userWithoutPassword } = user;
+            return userWithoutPassword;
+          }
+        }
+
+        return null;
+      }
     }),
-    /**
-     * ...add more providers here.
-     *
-     * Most other providers require a bit more work than the Discord provider. For example, the
-     * GitHub provider requires you to add the `refresh_token_expires_in` field to the Account
-     * model. Refer to the NextAuth.js docs for the provider you want to use. Example:
-     *
-     * @see https://next-auth.js.org/providers/github
-     */
   ],
 };
 
