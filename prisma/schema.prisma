@@ -111,17 +111,17 @@ model BookReview {
 
 // TODO: Private threads
 model DiscussionThread {
-    id              Int       @id @default(autoincrement())
+    id              Int         @id @default(autoincrement())
     title           String
-    createdAt       DateTime  @default(now())
-    updatedAt       DateTime  @updatedAt
-    publishedDate   DateTime
-    createdBy       User    @relation(fields: [createdById], references: [id], name: "CreatedThreads")
+    createdAt       DateTime    @default(now())
+    updatedAt       DateTime    @updatedAt
+    publishedDate   DateTime    @default(now())
+    createdBy       User        @relation(fields: [createdById], references: [id], name: "CreatedThreads")
     createdById     String
-    book            Book     @relation(fields: [bookId], references: [id])
+    book            Book        @relation(fields: [bookId], references: [id])
     bookId          String
     posts           DiscussionPost[]
-    members         User[]   @relation(name: "JoinedThreads")
+    members         User[]      @relation(name: "JoinedThreads")
 
     @@index([title])
 }
