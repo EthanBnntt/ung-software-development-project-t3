@@ -14,18 +14,6 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
-
-    @@index([name])
-}
-
 // Necessary for Next auth
 model Account {
     id                       String  @id @default(cuid())
@@ -55,15 +43,18 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    posts         Post[]
-    password      String
+    id              String    @id @default(cuid())
+    name            String?
+    email           String?   @unique
+    emailVerified   DateTime?
+    image           String?
+    accounts        Account[]
+    sessions        Session[]
+    password        String
+    createdThreads  DiscussionThread[] @relation(name: "CreatedThreads")
+    joinedThreads   DiscussionThread[] @relation(name: "JoinedThreads")
+    posts           DiscussionPost[]
+    reviews         BookReview[]
 }
 
 model VerificationToken {
@@ -72,4 +63,79 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model Book {
+    id            String    @id @default(cuid())
+    title         String
+    authors       Author[]
+    publishedDate DateTime
+    isbn          String    @unique
+    genres        Genre[]
+    minAge        Int       @default(0)
+    maxAge        Int       @default(120)
+    threads       DiscussionThread[]
+    reviews       BookReview[]
+    lastActivity  DateTime  @default(now())
+
+    @@index([title])
+}
+
+model Author {
+    id    Int     @id @default(autoincrement())
+    name  String
+    books Book[]
+}
+
+model Genre {
+    id    Int     @id @default(autoincrement())
+    name  String
+    books Book[]
+}
+
+model BookReview {
+    id        Int      @id @default(autoincrement())
+    content   String
+    rating    Int
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    createdBy   User   @relation(fields: [createdById], references: [id])
+    createdById String
+    book        Book   @relation(fields: [bookId], references: [id])
+    bookId      String
+
+    @@index([content])
+
+}
+
+// TODO: Private threads
+model DiscussionThread {
+    id              Int       @id @default(autoincrement())
+    title           String
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    publishedDate   DateTime
+    createdBy       User    @relation(fields: [createdById], references: [id], name: "CreatedThreads")
+    createdById     String
+    book            Book     @relation(fields: [bookId], references: [id])
+    bookId          String
+    posts           DiscussionPost[]
+    members         User[]   @relation(name: "JoinedThreads")
+
+    @@index([title])
+}
+
+model DiscussionPost {
+    id        Int      @id @default(autoincrement())
+    content   String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    createdBy   User   @relation(fields: [createdById], references: [id])
+    createdById String
+    thread      DiscussionThread @relation(fields: [threadId], references: [id])
+    threadId    Int
+
+    @@index([content])
 }
