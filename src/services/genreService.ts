@@ -18,7 +18,7 @@ export function addGenre(genreName: string): Promise<Genre> {
 }
 
 export async function getOrAddGenreByName(genreName: string): Promise<Genre> {
-    const genre = await getGenreByName(genreName);
+    const genre = await getGenreByName(genreName.toLowerCase());
     if (genre) return genre;
     return await addGenre(genreName);
 }
