@@ -1,7 +1,10 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
+import { Button } from './button';
 
 export function Logo() {
     return (
@@ -17,26 +20,26 @@ export function Logo() {
 }
 
 export function SearchBar() {
+    const [query, setQuery] = useState('');
+    const router = useRouter();
+
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        router.push(`/search?q=${query}`);
+    };
+
     return (
         <div className="flex-1 mx-4">
-            <input
-                type="text"
-                placeholder="Search..."
-                className="w-full px-4 py-2 border border-pink-200 rounded-full focus:outline-none focus:ring-2 focus:ring-pink-300"
-                style={{ backgroundColor: '#fffafc' }} // Pastel pink background
-            />
-        </div>
-    )
-}
-
-export function Button({ children, href, type, ...props }: { children: React.ReactNode, type?: string, href?: string }) {
-    return (
-        <div className={"flex items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 border-2" +
-            (!type || type == "primary" ? " text-white bg-pink-500 hover:bg-pink-600 focus:ring-pink-300 border-pink-300 rounded-full" : "") +
-            (type == "secondary" ? " text-white bg-pink-300 hover:bg-pink-400 focus:ring-pink-200 border-2 border-pink-500 rounded-full" : "")}
-            {...props}
-        >
-            {href ? (<Link href={href}>{children}</Link>) : children}
+            <form onSubmit={handleSubmit}>
+                <input
+                    type="text"
+                    placeholder="Search by genres separated by commas..."
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    className="w-full px-4 py-2 border border-pink-200 rounded-full focus:outline-none focus:ring-2 focus:ring-pink-300"
+                    style={{ backgroundColor: '#fffafc' }} // Pastel pink background
+                />
+            </form>
         </div>
     )
 }
