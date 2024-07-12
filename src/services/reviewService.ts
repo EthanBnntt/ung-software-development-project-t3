@@ -39,8 +39,6 @@ export async function addReview(
         }
     });
 
-    console.log(existingReview ?? 'No existing review found');
-
     if (existingReview)
         await db.bookReview.deleteMany({
             where: {
