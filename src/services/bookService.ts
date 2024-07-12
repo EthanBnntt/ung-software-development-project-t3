@@ -4,18 +4,25 @@ import type { Genre, Book, Author } from '@prisma/client';
 import { getOrAddAuthorByName } from './authorService';
 import { getOrAddGenreByName } from './genreService';
 
-export function getAllBooks(): Promise<(Book & { authors?: Author[] })[]> {
+export function getAllBooks(): Promise<(Book & { authors?: Author[], genres?: Genre[] })[]> {
     return db.book.findMany({
-        include: { authors: true },
+        include: {
+            authors: true,
+            genres: true,
+        },
     })
 }
 
-export async function getBookByISBN(isbn: string): Promise<Book | null> {
+export async function getBookByISBN(isbn: string): Promise<(Book & { authors?: Author[] }) | null> {
     const book = await db.book.findFirst({
         where: {
             isbn: isbn
         },
-        include: { authors: true },
+        include: {
+            authors: true,
+            genres: true,
+            reviews: true,
+        },
     });
 
     return book;
@@ -40,6 +47,28 @@ export async function getBooksByGenreName(genreName: string): Promise<(Book & { 
         },
         include: { authors: true },
     });
+}
+
+export async function getBooksByGenreNames(genreNames: string[]): Promise<(Book & { authors?: Author[], genres?: Genre[] })[]> {
+    const genres = await Promise.all(genreNames.map(genreName => getOrAddGenreByName(genreName)));
+
+    const books = await db.book.findMany({
+        where: {
+            genres: {
+                some: {
+                    id: {
+                        in: genres.map(genre => genre.id)
+                    },
+                }
+            }
+        },
+        include: {
+            authors: true,
+            genres: true,
+        },
+    });
+
+    return books;
 }
 
 export async function getTrendingBooks(): Promise<(Book & { authors?: Author[] })[]> {
@@ -134,3 +163,4 @@ export async function addBook(
 
     return book;
 }
+
