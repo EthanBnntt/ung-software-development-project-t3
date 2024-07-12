@@ -41,9 +41,13 @@ export const bookRouter = createTRPCRouter({
         }),
 
     getBooksByGenreNames: publicProcedure
-        .input(z.object({ genreNames: z.array(z.string()) }))
+        .input(z.object({
+            genreNames: z.array(z.string()),
+            minAge: z.number().max(100).optional(),
+            maxAge: z.number().max(100).optional(),
+        }))
         .query(async ({ input }) => {
-            return await getBooksByGenreNames(input.genreNames);
+            return await getBooksByGenreNames(input.genreNames, input.minAge, input.maxAge);
         }),
 
     getTrendingBooks: publicProcedure

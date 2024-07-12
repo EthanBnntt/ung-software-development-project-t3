@@ -49,10 +49,10 @@ export async function getBooksByGenreName(genreName: string): Promise<(Book & { 
     });
 }
 
-export async function getBooksByGenreNames(genreNames: string[]): Promise<(Book & { authors?: Author[], genres?: Genre[] })[]> {
+export async function getBooksByGenreNames(genreNames: string[], minAge?: number, maxAge?: number): Promise<(Book & { authors?: Author[], genres?: Genre[] })[]> {
     const genres = await Promise.all(genreNames.map(genreName => getOrAddGenreByName(genreName)));
 
-    const books = await db.book.findMany({
+    return await db.book.findMany({
         where: {
             genres: {
                 some: {
@@ -60,15 +60,19 @@ export async function getBooksByGenreNames(genreNames: string[]): Promise<(Book 
                         in: genres.map(genre => genre.id)
                     },
                 }
-            }
+            },
+            minAge: {
+                lte: minAge ?? 0,
+            },
+            maxAge: {
+                gte: maxAge ?? 100,
+            },
         },
         include: {
             authors: true,
             genres: true,
         },
     });
-
-    return books;
 }
 
 export async function getTrendingBooks(): Promise<(Book & { authors?: Author[] })[]> {
