@@ -12,6 +12,7 @@ import {
     getTrendingBooks,
     getNewBooks,
     getBooksByAuthorName,
+    getBooksByGenreNames
  } from '~/services/bookService';
 
 export const bookRouter = createTRPCRouter({    
@@ -22,14 +23,27 @@ export const bookRouter = createTRPCRouter({
     
     getBookByISBN: publicProcedure
         .input(z.object({ isbn: z.string() }))
-        .query(({ input }) => {
-            return getBookByISBN(input.isbn);
+        .query(async ({ input }) => {
+            // TODO: Idk if this correctly handles missing books
+
+            const book = await getBookByISBN(input.isbn);
+
+            if (!book)
+                throw new Error('Book not found');
+
+            return book;
         }),
     
     getBooksByGenreName: publicProcedure
         .input(z.object({ genreName: z.string() }))
         .query(async ({ input }) => {
             return await getBooksByGenreName(input.genreName);
+        }),
+
+    getBooksByGenreNames: publicProcedure
+        .input(z.object({ genreNames: z.array(z.string()) }))
+        .query(async ({ input }) => {
+            return await getBooksByGenreNames(input.genreNames);
         }),
 
     getTrendingBooks: publicProcedure
