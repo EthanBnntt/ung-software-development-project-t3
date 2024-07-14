@@ -5,14 +5,7 @@ import type { Book, Author, Genre } from '@prisma/client';
 import { api } from '~/trpc/react';
 import { BookThumbnail } from './bookThumbnail';
 import { ViewReviewsList } from './viewReviewsList';
-
-export function Pill({ children }: { children: React.ReactNode }) {
-    return (
-        <span className="inline-block bg-gray-200 rounded-full ml-3 px-3 py-1 text-sm font-semibold text-gray-700 mb-2">
-            {children}
-        </span>
-    );
-}
+import { Pill } from './pill';
 
 export function ViewBook({ isbn, isAuthenticated }: { isbn: string, isAuthenticated: boolean }) {
     const bookQuery = api.book.getBookByISBN.useQuery({
