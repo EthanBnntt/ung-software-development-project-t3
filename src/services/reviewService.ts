@@ -1,5 +1,5 @@
 import { db } from "~/server/db";
-import type { Book, User, BookReview } from '@prisma/client';
+import type { Book, User, BookReview, Genre } from '@prisma/client';
 
 export async function getReviewsByISBN(isbn: string): Promise<(BookReview & { book?: Book, user?: User })[]> {
     const reviews = await db.bookReview.findMany({
@@ -72,6 +72,43 @@ export async function getAllReviews(): Promise<(BookReview & { book?: Book, user
         include: {
             book: true,
             createdBy: true,
+        },
+    });
+
+    return reviews;
+}
+
+export async function getReviewsByGenreNames(genreNames: string[], minAge: number, maxAge: number): Promise<(BookReview & {
+    book?: Book & {
+        genres?: Genre[]
+    },
+    user?: User
+})[]> {
+    const reviews = await db.bookReview.findMany({
+        where: {
+            book: {
+                genres: {
+                    some: {
+                        name: {
+                            in: genreNames
+                        }
+                    }
+                },
+                minAge: {
+                    lte: maxAge
+                },
+                maxAge: {
+                    gte: minAge
+                }
+            }
+        },
+        include: {
+            book: {
+                include: {
+                    genres: true
+                }
+            },
+            createdBy: true, // TODO: Do we need this?
         },
     });
 

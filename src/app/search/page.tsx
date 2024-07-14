@@ -1,13 +1,3 @@
-/*
-INPUT: Emily, a stay-at-home mom, wants to easily find books for herself and her kids using a genre and age range menu.
-
-ACTIVATION: Emily selects the desired genres and age ranges from the menu. She then clicks on the “search books” button.
-
-ACTION: The system searches for books that match the selected genres and age ranges.
-
-OUTPUT: Emily receives a list of books that fit the chosen genres and age ranges, making it easy for her to find suitable books for herself and her kids.
-*/
-
 "use client";
 
 import React, { useState } from 'react';
@@ -16,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { api } from "~/trpc/react";
 import { BookThumbnail } from '../_components/bookThumbnail';
 import { Button } from '../_components/button';
+import { Pill } from '../_components/pill';
 
 export default function SearchPage() {
     const searchParams = useSearchParams();
@@ -40,15 +31,26 @@ export default function SearchPage() {
         maxAge: queryMaxAge,
     });
 
+    const reviewsSearchQuery = api.review.getReviewsByGenreNames.useQuery({
+        genreNames: genresList,
+        minAge: queryMinAge,
+        maxAge: queryMaxAge,
+    });
+    
     if (searchQuery.error) {
         return <div>Error: {searchQuery.error.message}</div>;
     }
 
-    if (searchQuery.isLoading) {
+    if (reviewsSearchQuery.error) {
+        return <div>Error: {reviewsSearchQuery.error.message}</div>;
+    }
+
+    if (searchQuery.isLoading || reviewsSearchQuery.isLoading) {
         return <div>Loading...</div>;
     }
 
     const books = searchQuery.data ?? [];
+    const reviews = reviewsSearchQuery.data ?? [];
 
     function searchWithNewQuery() {
         router.push(`/search?q=${genresList.join(',')}&minAge=${minAge}&maxAge=${maxAge}`);
@@ -56,17 +58,13 @@ export default function SearchPage() {
 
     const updateMinimumAge = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newMinAge = parseInt(e.target.value, 10);
-        if (newMinAge > maxAge) {
-            setMaxAge(newMinAge);
-        }
+        if (newMinAge >= maxAge) setMaxAge(newMinAge + 1 < 100 ? newMinAge + 1 : 100);
         setMinAge(newMinAge);
     };
 
     const updateMaximumAge = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newMaxAge = parseInt(e.target.value, 10);
-        if (newMaxAge < minAge) {
-            setMinAge(newMaxAge);
-        }
+        if (newMaxAge <= minAge) setMinAge(newMaxAge - 1 > 0 ? newMaxAge - 1 : 0);
         setMaxAge(newMaxAge);
     };
 
@@ -84,7 +82,7 @@ export default function SearchPage() {
                             min="0"
                             max="100"
                             value={minAge}
-                            onChange={(e) => updateMinimumAge(e)}
+                            onChange={updateMinimumAge}
                             className="w-full mb-2"
                         />
                         <label htmlFor="maxAge" className="w-1/2">Maximum Age: {maxAge}</label>
@@ -94,7 +92,7 @@ export default function SearchPage() {
                             min="0"
                             max="100"
                             value={maxAge}
-                            onChange={(e) => updateMaximumAge(e)}
+                            onChange={(e) => updateMaximumAge}
                             className="w-full mb-2"
                         />
                     </div>
@@ -102,10 +100,8 @@ export default function SearchPage() {
                 <Button onClick={() => searchWithNewQuery()}>Change Search Query</Button>
             </div>
             <div className="border-t border-gray-200 pt-4">
-                <h2 className="text-2xl mb-2">Results</h2>
-                {searchQuery.isLoading ? (
-                    <p className="text-lg">Loading...</p>
-                ) : books.length > 0 ? (
+                <h2 className="text-2xl mb-2">Books</h2>
+                {books.length > 0 ? (
                     <div className="flex flex-wrap">
                         {books.map(book => (
                             <BookThumbnail key={book.isbn} isbn={book.isbn} title={book.title} isLoading={false} />
@@ -114,6 +110,32 @@ export default function SearchPage() {
                 ) : (
                     <p className="text-lg">No results found. Please adjust your search criteria.</p>
                 )}
+            </div>
+            <div className="container mx-auto">
+                <div className="flex flex-col md:flex-row">
+                    <div className="md:w-1/2 py-4">
+                        <h2 className="text-2xl mb-2">Reviews</h2>
+                        {reviews.length > 0 ? (
+                            <div className="flex flex-wrap">
+                                {reviews.map(review => (
+                                    <div key={review.id} className="w-full mb-4">
+                                        <h3 className="text-xl">{review?.book?.title}</h3>
+                                        <p className="text-lg mb-2"><strong>Genres:</strong>
+                                            <span className="pr-3">
+                                                {review?.book?.genres?.map(genre => (
+                                                    <Pill key={genre.name}>{genre.name}</Pill>
+                                                ))}
+                                            </span>
+                                        </p>
+                                        <p className="text-md">{review.content}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-lg">No reviews found. Please adjust your search criteria.</p>
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
     );
