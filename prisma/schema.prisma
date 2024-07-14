@@ -52,9 +52,9 @@ model User {
     sessions        Session[]
     password        String
     createdThreads  DiscussionThread[] @relation(name: "CreatedThreads")
-    joinedThreads   DiscussionThread[] @relation(name: "JoinedThreads")
     posts           DiscussionPost[]
     reviews         BookReview[]
+    communities     Community[]
 }
 
 model VerificationToken {
@@ -74,7 +74,6 @@ model Book {
     genres        Genre[]
     minAge        Int       @default(0)
     maxAge        Int       @default(120)
-    threads       DiscussionThread[]
     reviews       BookReview[]
     lastActivity  DateTime  @default(now())
     description   String    @default("")
@@ -106,8 +105,16 @@ model BookReview {
     book        Book   @relation(fields: [bookId], references: [id])
     bookId      String
 
-    @@index([content])
+}
 
+model Community {
+    id          Int      @id @default(autoincrement())
+    name        String
+    createdBy   User     @relation(fields: [createdById], references: [id])
+    createdById String
+    threads     DiscussionThread[]
+    isPrivate   Boolean  @default(false)
+    accessCode  String?
 }
 
 // TODO: Private threads
@@ -116,13 +123,11 @@ model DiscussionThread {
     title           String
     createdAt       DateTime    @default(now())
     updatedAt       DateTime    @updatedAt
-    publishedDate   DateTime    @default(now())
     createdBy       User        @relation(fields: [createdById], references: [id], name: "CreatedThreads")
     createdById     String
-    book            Book        @relation(fields: [bookId], references: [id])
-    bookId          String
     posts           DiscussionPost[]
-    members         User[]      @relation(name: "JoinedThreads")
+    community       Community    @relation(fields: [communityId], references: [id])
+    communityId     Int
 
     @@index([title])
 }
