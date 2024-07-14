@@ -1,29 +1,37 @@
-# Create T3 App
+# How do I install and setup this program?
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+## Prerquisites
 
-## What's next? How do I make an app with this?
+Install node js from the [Node.js Download Page](https://nodejs.org/en/download/prebuilt-installer).
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+Install Git from the [Git Download Page](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+Run ```git clone https://github.com/EthanBnntt/ung-software-development-project-t3.git``` in the command prompt.
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+Run ```cd ./ung-software-development-project-t3.git``` in the commnad prompt.
 
-## Learn More
+Run ```npm install``` in the command prompt.
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+Add a ```.env``` file, with the following content:
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+```
+DATABASE_URL="file:./db.sqlite"
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+# Next Auth
+# You can generate a new secret on the command line with:
+# openssl rand -base64 32
+# https://next-auth.js.org/configuration/options#secret
+# NEXTAUTH_SECRET=""
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="password"
 
-## How do I deploy this?
+# Next Auth Discord Provider
+DISCORD_CLIENT_ID=""
+DISCORD_CLIENT_SECRET=""
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+JWT_SECRET="password"
+```
+
+Your app should be running at ```http://localhost:3000/```.
+
+To start the database manager, run ```npx prisma studio```.
