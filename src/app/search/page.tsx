@@ -3,10 +3,15 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+
 import { api } from "~/trpc/react";
 import { BookThumbnail } from '../_components/bookThumbnail';
 import { Button } from '../_components/button';
 import { Pill } from '../_components/pill';
+
+import type { Book, Community, BookReview, Genre, Author } from '@prisma/client';
+
 
 export default function SearchPage() {
     const searchParams = useSearchParams();
@@ -36,21 +41,25 @@ export default function SearchPage() {
         minAge: queryMinAge,
         maxAge: queryMaxAge,
     });
+
+    const communitisSearchQuery = api.community.getCommunitiesByGenreNames.useQuery({
+        genreNames: genresList,
+    });
     
-    if (searchQuery.error) {
-        return <div>Error: {searchQuery.error.message}</div>;
-    }
+    if (searchQuery.error ?? reviewsSearchQuery.error ?? communitisSearchQuery.error)
+        return (
+            <div>
+                Error: {searchQuery.error?.message ?? reviewsSearchQuery.error?.message ?? communitisSearchQuery.error?.message}
+            </div>
+        );
 
-    if (reviewsSearchQuery.error) {
-        return <div>Error: {reviewsSearchQuery.error.message}</div>;
-    }
-
-    if (searchQuery.isLoading || reviewsSearchQuery.isLoading) {
+    if (searchQuery.isLoading || reviewsSearchQuery.isLoading || communitisSearchQuery.isLoading) {
         return <div>Loading...</div>;
     }
 
-    const books = searchQuery.data ?? [];
-    const reviews = reviewsSearchQuery.data ?? [];
+    const books: (Book & { authors?: Author[], genres?: Genre[] })[] = searchQuery.data ?? [];
+    const reviews: (BookReview & { book?: Book & { genres?: Genre[] } })[] = reviewsSearchQuery.data ?? [];
+    const communities: (Community & { genres: Genre[] })[] = communitisSearchQuery.data ?? [];
 
     function searchWithNewQuery() {
         router.push(`/search?q=${genresList.join(',')}&minAge=${minAge}&maxAge=${maxAge}`);
@@ -71,6 +80,7 @@ export default function SearchPage() {
     return (
         <div className="p-4">
             <h1 className="text-3xl mb-4">Search Results</h1>
+            {/** Search Query */}
             <div className="mb-4">
                 <div className="mb-2">
                     <p className="text-lg mb-2"><strong>Genres:</strong> {genresList.join(', ') || 'N/A'}</p>
@@ -99,6 +109,7 @@ export default function SearchPage() {
                 </div>
                 <Button onClick={() => searchWithNewQuery()}>Change Search Query</Button>
             </div>
+            {/** Books */}
             <div className="border-t border-gray-200 pt-4">
                 <h2 className="text-2xl mb-2">Books</h2>
                 {books.length > 0 ? (
@@ -111,6 +122,7 @@ export default function SearchPage() {
                     <p className="text-lg">No results found. Please adjust your search criteria.</p>
                 )}
             </div>
+            {/** Reviews */}
             <div className="container mx-auto">
                 <div className="flex flex-col md:flex-row">
                     <div className="md:w-1/2 py-4">
@@ -118,7 +130,7 @@ export default function SearchPage() {
                         {reviews.length > 0 ? (
                             <div className="flex flex-wrap">
                                 {reviews.map(review => (
-                                    <div key={review.id} className="w-full mb-4">
+                                    <Link href={"/books/" + review?.book?.isbn} key={review.id} className="w-full mb-4">
                                         <h3 className="text-xl">{review?.book?.title}</h3>
                                         <p className="text-lg mb-2"><strong>Genres:</strong>
                                             <span className="pr-3">
@@ -128,11 +140,37 @@ export default function SearchPage() {
                                             </span>
                                         </p>
                                         <p className="text-md">{review.content}</p>
-                                    </div>
+                                    </Link>
                                 ))}
                             </div>
                         ) : (
                             <p className="text-lg">No reviews found. Please adjust your search criteria.</p>
+                        )}
+                    </div>
+                </div>
+            </div>
+            {/** Communities */}
+            <div className="container mx-auto">
+                <div className="flex flex-col md:flex-row">
+                    <div className="md:w-1/2 py-4">
+                        <h2 className="text-2xl mb-2">Relevant Communities</h2>
+                        {communities.length > 0 ? (
+                            <div className="flex flex-wrap">
+                                {communities.map(community => (
+                                    <Link href={"/community/" + community.id} key={community.id} className="w-full mb-4">
+                                        <h3 className="text-xl">{community.name}</h3>
+                                        <p className="text-lg mb-2"><strong>Genres:</strong>
+                                            <span className="pr-3">
+                                                {community?.genres.map(genre => (
+                                                    <Pill key={genre.name}>{genre.name}</Pill>
+                                                ))}
+                                            </span>
+                                        </p>
+                                    </Link>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-lg">No communities found. Please adjust your search criteria.</p>
                         )}
                     </div>
                 </div>

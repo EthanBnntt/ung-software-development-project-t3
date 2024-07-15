@@ -3,6 +3,7 @@ import { userRouter } from "~/server/api/routers/user";
 import { bookRouter } from "~/server/api/routers/book";
 import { discussionThreadRouter } from "~/server/api/routers/discussionThread";
 import { reviewRouter } from "~/server/api/routers/review";
+import { communityRouter } from "~/server/api/routers/community";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 /**
@@ -16,6 +17,7 @@ export const appRouter = createTRPCRouter({
   book: bookRouter,
   discussionThread: discussionThreadRouter,
   review: reviewRouter,
+  community: communityRouter,
 });
 
 // export type definition of API
