@@ -33,7 +33,7 @@ export function SearchBar() {
             <form onSubmit={handleSubmit}>
                 <input
                     type="text"
-                    placeholder="Search by genres separated by commas..."
+                    placeholder="Search by genres (separated by commas)..."
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     className="w-full px-4 py-2 border border-pink-200 rounded-full focus:outline-none focus:ring-2 focus:ring-pink-300"
