@@ -88,9 +88,10 @@ model Author {
 }
 
 model Genre {
-    id    Int     @id @default(autoincrement())
-    name  String
-    books Book[]
+    id          Int     @id @default(autoincrement())
+    name        String
+    books       Book[]
+    communities Community[]
 }
 
 model BookReview {
@@ -115,6 +116,9 @@ model Community {
     threads     DiscussionThread[]
     isPrivate   Boolean  @default(false)
     accessCode  String?
+    genres      Genre[]
+
+    @@index([name])
 }
 
 // TODO: Private threads
@@ -126,8 +130,9 @@ model DiscussionThread {
     createdBy       User        @relation(fields: [createdById], references: [id], name: "CreatedThreads")
     createdById     String
     posts           DiscussionPost[]
-    community       Community    @relation(fields: [communityId], references: [id])
-    communityId     Int
+    community       Community?   @relation(fields: [communityId], references: [id])
+    communityId     Int?
+
 
     @@index([title])
 }
