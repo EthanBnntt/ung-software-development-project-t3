@@ -1,11 +1,15 @@
 "use client";
 
 import React from 'react';
+import Link from 'next/link';
+
 import { api } from '~/trpc/react';
 
-export function ListThreads({ isbn }: { isbn: string }) {
-    const threadsQuery = api.discussionThread.getThreadsByBookISBN.useQuery({
-        bookISBN: isbn,
+import { CreateThreadForm } from './createThreadForm';
+
+export function ListThreads({ communityId, isAuthenticated }: { communityId: number, isAuthenticated: boolean }) {
+    const threadsQuery = api.discussionThread.getThreadsByCommunityId.useQuery({
+        communityId,
     });
 
     if (threadsQuery.isLoading) {
@@ -22,18 +26,25 @@ export function ListThreads({ isbn }: { isbn: string }) {
         return <div>No threads found</div>;
     }
 
-    console.log(threads);
-
     return (
-        <div className="mt-4">
-            <h2 className="text-2xl mb-2">Discussion Threads</h2>
-            <div className="space-y-4">
-                {threads.map((thread) => (
-                    <div key={thread.id} className="p-4 border rounded-md shadow-sm">
-                        <h2 className="text-lg font-semibold">{thread.title}</h2>
-                    </div>
-                ))}
+        <div className="container mx-auto">
+            <CreateThreadForm communityId={communityId} isAuthenticated={isAuthenticated} onSubmit={() => threadsQuery.refetch()} />
+            <div className="flex flex-col md:flex-row">
+                <div className="md:w-2/3 py-4">
+                    <h2 className="text-2xl mb-2">Threads</h2>
+                    {threads.length === 0 ? (
+                        <div>No threads</div>
+                    ) : (
+                        <div className="py-4">
+                            {threads.map(thread => (
+                                <Link key={thread.id} href={`/community/${communityId}/thread/${thread.id}`} className="block p-4 rounded-md hover:bg-gray-100 transition">
+                                    <h2 className="text-lg font-semibold">{thread.title}</h2>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
-    );
+    )
 }
