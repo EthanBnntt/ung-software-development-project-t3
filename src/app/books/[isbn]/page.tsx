@@ -18,10 +18,6 @@ export default async function ViewBookPage({ params }: { params: { isbn: string 
         <HydrateClient>
             <main className="flex min-h-screen flex-col">
                 <ViewBook isbn={isbn} isAuthenticated={session?.user !== null} />
-                <div className="w-2/3">
-                    <CreateThreadForm isbn={isbn} isAuthenticated={session?.user !== null} />
-                    <ListThreads isbn={isbn} />
-                </div>
             </main>
         </HydrateClient>
     );
