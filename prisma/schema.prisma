@@ -54,7 +54,8 @@ model User {
     createdThreads  DiscussionThread[] @relation(name: "CreatedThreads")
     posts           DiscussionPost[]
     reviews         BookReview[]
-    communities     Community[]
+    communities     Community[] @relation("CreatedCommunities")
+    subscribedTo    Community[] @relation("SubscribedCommunities")
 }
 
 model VerificationToken {
@@ -111,12 +112,13 @@ model BookReview {
 model Community {
     id          Int      @id @default(autoincrement())
     name        String
-    createdBy   User     @relation(fields: [createdById], references: [id])
+    createdBy   User     @relation(fields: [createdById], references: [id], name: "CreatedCommunities")
     createdById String
     threads     DiscussionThread[]
     isPrivate   Boolean  @default(false)
     accessCode  String?
     genres      Genre[]
+    subscribers User[]   @relation("SubscribedCommunities")
 
     @@index([name])
 }
