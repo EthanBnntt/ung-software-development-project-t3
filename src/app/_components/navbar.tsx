@@ -54,6 +54,11 @@ export function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
                 {/* Search Bar */}
                 <SearchBar />
 
+                {/* Create Community Link */}
+                {isLoggedIn && (
+                    <Link href="/create-community" className="pr-4 text-pink-300">Create Community</Link>
+                )}
+
                 {/* Login/Signup Button */}
                 {!isLoggedIn ? (
                     <Button href="/api/auth/signin" type="primary">Login/Signup</Button>

@@ -22,8 +22,8 @@ export function ListThreads({ communityId, isAuthenticated }: { communityId: num
 
     const threads = threadsQuery.data;
 
-    if (!threads || threads.length === 0) {
-        return <div>No threads found</div>;
+    if (!threads) {
+        return <div>Problem while finding threads.</div>;
     }
 
     return (
