@@ -1,5 +1,4 @@
 // server/routers/userRouter.ts
-import { access } from 'fs';
 import { z } from 'zod';
 import {
     createTRPCRouter,
