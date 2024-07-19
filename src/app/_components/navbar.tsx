@@ -61,7 +61,10 @@ export function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
 
                 {/* Login/Signup Button */}
                 {!isLoggedIn ? (
-                    <Button href="/api/auth/signin" type="primary">Login/Signup</Button>
+                 <>
+                    <Button href="/api/auth/signin" type="primary">Login</Button>
+                    <Button href="/signup" type="primary">Signup</Button>
+                </>
                 ) : (
                     <Button href="/api/auth/signout" type="primary">Logout</Button>
                 )}
