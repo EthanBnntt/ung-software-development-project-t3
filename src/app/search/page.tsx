@@ -102,7 +102,7 @@ export default function SearchPage() {
                             min="0"
                             max="100"
                             value={maxAge}
-                            onChange={(e) => updateMaximumAge}
+                            onChange={updateMaximumAge}
                             className="w-full mb-2"
                         />
                     </div>
