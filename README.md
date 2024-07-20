@@ -8,7 +8,7 @@ Install Git from the [Git Download Page](https://git-scm.com/book/en/v2/Getting-
 
 Run ```git clone https://github.com/EthanBnntt/ung-software-development-project-t3.git``` in the command prompt.
 
-Run ```cd ./ung-software-development-project-t3.git``` in the commnad prompt.
+Run ```cd ./ung-software-development-project-t3``` in the commnad prompt.
 
 Run ```npm install``` in the command prompt.
 
