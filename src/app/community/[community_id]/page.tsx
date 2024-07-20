@@ -34,9 +34,6 @@ export default async function ViewCommunityPage({ params }: { params: { communit
         }
     }
 
-    if (community.isPrivate && session?.user?.id) {
-    }
-
     return (
         <div className="p-4">
             <h1 className="text-3xl mb-4">Viewing Community &quot;{community.name}&quot;</h1>

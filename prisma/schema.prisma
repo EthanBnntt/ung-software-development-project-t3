@@ -123,7 +123,6 @@ model Community {
     @@index([name])
 }
 
-// TODO: Private threads
 model DiscussionThread {
     id              Int         @id @default(autoincrement())
     title           String
@@ -134,7 +133,6 @@ model DiscussionThread {
     posts           DiscussionPost[]
     community       Community?   @relation(fields: [communityId], references: [id])
     communityId     Int?
-
 
     @@index([title])
 }

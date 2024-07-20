@@ -56,30 +56,30 @@ export const authOptions: NextAuthOptions = {
 	adapter: PrismaAdapter(db) as Adapter,
 	providers: [
 		CredentialsProvider({
-		name: "Credentials",
-		credentials: {
-			email: { label: "Email", type: "text" },
-			password: { label: "Password", type: "password" },
-		},
-		authorize: async (credentials) => {
-			// Add your own logic here to find the user from the credentials supplied
-			const user = await db.user.findUnique({
-			where: { email: credentials?.email },
-			});
+			name: "Credentials",
+			credentials: {
+				email: { label: "Email", type: "text" },
+				password: { label: "Password", type: "password" },
+			},
+			authorize: async (credentials) => {
+				// Add your own logic here to find the user from the credentials supplied
+				const user = await db.user.findUnique({
+				where: { email: credentials?.email },
+				});
 
-			if (user?.password) {
-			const isPasswordValid = await bcrypt.compare(credentials?.password ?? '', String(user?.password ?? ''));
-			if (isPasswordValid) {
-				// Remove the password field before returning the user object
-				const { password, ...userWithoutPassword } = user;
+				if (user?.password) {
+				const isPasswordValid = await bcrypt.compare(credentials?.password ?? '', String(user?.password ?? ''));
+				if (isPasswordValid) {
+					// Remove the password field before returning the user object
+					const { password, ...userWithoutPassword } = user;
 
-				return userWithoutPassword;
+					return userWithoutPassword;
+				}
+				}
+
+				console.log("Failed to authenticate user", credentials);
+				return null;
 			}
-			}
-
-			console.log("Failed to authenticate user", credentials);
-			return null;
-		}
 		}),
 	],
 };

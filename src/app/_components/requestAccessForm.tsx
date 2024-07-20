@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { api } from "~/trpc/react";
 import { Button } from './button';
 
-export function RequestAccessForm({ communityId }: { communityId: number, isAuthenticated: boolean }) {
+export function RequestAccessForm({ communityId }: { communityId: number }) {
     const [accessCode, setAccessCode] = useState('');
 
     const requestAccess = api.community.accessCommunity.useMutation();

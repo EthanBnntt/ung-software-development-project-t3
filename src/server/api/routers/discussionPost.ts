@@ -6,12 +6,6 @@ import {
 } from "~/server/api/trpc";
 
 import {
-    createThread,
-    getThreadsByBookISBN,
-    getThreadsByCommunityId
-} from "~/services/discussionThreadService";
-
-import {
     createDiscussionPost,
     getDiscussionPostsByThreadId,
 } from "~/services/discussionPostService";

@@ -1,4 +1,3 @@
-// server/routers/userRouter.ts
 import { z } from 'zod';
 import {
     createTRPCRouter,
